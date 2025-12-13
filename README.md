@@ -177,3 +177,112 @@ Linear scoring. Old school. Reliable. Explainable.
 
 
 
+## Lightweight Inference
+
+Lightweight inference is not "decide the correct tags"
+
+It is "general plausible guesses + explain why"
+
+So the output of inference is 
+enriched data, not mutated data. 
+
+Think annotate, not overwrite. 
+
+for v0, let's infer 
+
+Artist
+Title 
+
+Ignore album, year, genre, etc. 
+
+Less surface area = fewer bugs = more trust
+
+Step 1: define what we infer (limit scope)
+
+Step 2: inputs to inference 
+
+Step 3: 
+  Rule 1: Token overlap check 
+      Simple, powerful 
+      - take metadata 
+      - split them into lower case tokens
+      - count overlap 
+      - scoring idea
+          O overlaps - confidence 0
+          1 token overlap - confidence .4
+          full overlap - confidence .7
+      - this tells us "metadata agrees with filename" or not
+  
+Step 4: 
+  Rule 2: Positional heuristics 
+
+  Rules 
+  Early tokens are more likely artist
+  Middle tokens are likely the title 
+  Parentheses usually version info, remixes, remastered, etc. 
+  
+  Example: 
+    daft punk - harder better faster stronger (live edit)
+  
+    inference: Artist candidate - first 1-2 tokens 
+    title candidates: tokens until (
+
+  "This gives us a fallback when metadata is missing."
+  
+Step 5. Generate hypotheses, not answers 
+  Instead of `artist = "Daft Punk"` 
+  We produce
+  `artist_candidate = DaftPunk, confidence 0.7, source filename+metadata`
+  Basically we store why. 
+
+
+Step 6. Extend the data structure 
+  Extractor output becomes enriched, not replaced. 
+  Conceptually:
+
+```json
+{
+  "filename": "...",
+  "tokens": [...],
+  "tags": {...},
+  "inference": {
+    "artist": {
+      "value": "Daft Punk",
+      "confidence": 0.7,
+      "source": "filename+metadata"
+    },
+    "title": {
+      "value": "Harder Better Faster Stronger",
+      "confidence": 0.6,
+      "source": "filename"
+    }
+  }
+}
+```
+
+Nothing applied yet. 
+Nothing destructive. 
+
+This is why our system will be trustworthy. 
+
+Step 7: No thresholds yet
+
+Important discipline 
+
+Do not decide 
+"if confidence > X, apply"
+
+Right now we just 
+  - Observe 
+  - Compare 
+  - Learn patterns
+
+Thresholds come after you've seen failures. 
+
+
+Simply put 
+  Extractor sees. 
+  Inference reasons. 
+
+Seperation = sanity 
+
