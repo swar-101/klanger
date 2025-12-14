@@ -286,3 +286,21 @@ Simply put
 
 Seperation = sanity 
 
+Rule A : Token overlap score 
+Rule B : Positional heuristics 
+Rule C : Inference Schema
+Rule D : Infer Artist 
+
+Rule B: 
+
+    - This rule only activates when metadata is missing or weak 
+    - It doesn't override Rule A. It complements it. 
+    - Aggregation, not replacement 
+    - We ecode this as heuristics, not truth. 
+
+Rule B v0: 
+    we infer only: 
+        Artist candidate 
+        Title candidate 
+    Nothing else. 
+
